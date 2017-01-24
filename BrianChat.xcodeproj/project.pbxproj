@@ -19,6 +19,7 @@
 
 /* Begin PBXFileReference section */
 		2A664DD643E40A0966D51B2E /* Pods-BrianChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BrianChat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BrianChat/Pods-BrianChat.debug.xcconfig"; sourceTree = "<group>"; };
+		7B3727B61E3805FF001299F1 /* BrianChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrianChat.entitlements; sourceTree = "<group>"; };
 		7B6800041E36EE6C00685D40 /* LoginVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		7B6800061E37032D00685D40 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7B68FFEF1E36EC7400685D40 /* BrianChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrianChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -82,6 +83,7 @@
 		7B68FFF11E36EC7400685D40 /* BrianChat */ = {
 			isa = PBXGroup;
 			children = (
+				7B3727B61E3805FF001299F1 /* BrianChat.entitlements */,
 				7B68FFF21E36EC7400685D40 /* AppDelegate.swift */,
 				7B6800041E36EE6C00685D40 /* LoginVC.swift */,
 				7B68FFF41E36EC7400685D40 /* ViewController.swift */,
@@ -131,6 +133,11 @@
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = ULU46F325W;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -295,6 +302,7 @@
 			baseConfigurationReference = 2A664DD643E40A0966D51B2E /* Pods-BrianChat.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BrianChat/BrianChat.entitlements;
 				DEVELOPMENT_TEAM = ULU46F325W;
 				INFOPLIST_FILE = BrianChat/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -309,6 +317,7 @@
 			baseConfigurationReference = 9D0190BD92183797FCF33C2C /* Pods-BrianChat.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BrianChat/BrianChat.entitlements;
 				DEVELOPMENT_TEAM = ULU46F325W;
 				INFOPLIST_FILE = BrianChat/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -378,6 +387,7 @@
 				7B6800031E36EC7400685D40 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7B68FFEA1E36EC7400685D40 /* Build configuration list for PBXProject "BrianChat" */ = {
 			isa = XCConfigurationList;
