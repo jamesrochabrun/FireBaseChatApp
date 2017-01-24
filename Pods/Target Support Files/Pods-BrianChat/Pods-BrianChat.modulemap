@@ -1,0 +1,6 @@
+framework module Pods_BrianChat {
+  umbrella header "Pods-BrianChat-umbrella.h"
+
+  export *
+  module * { export * }
+}
