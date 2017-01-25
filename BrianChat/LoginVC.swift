@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Firebase
 
 class LoginVC: UIViewController {
     
@@ -213,72 +212,6 @@ class LoginVC: UIViewController {
         passwordTextfiedlHeightAnchor?.isActive = true
     }
 }
-
-
-extension LoginVC { //Firebase + registration
-    
-    func handleLoginOrRegister() {
-        if loginRegisterSegmentedControl.selectedSegmentIndex == 0 {
-            handleLogin()
-        } else {
-            handleRegister()
-        }
-    }
-    
-    func handleLogin() {
-        
-        guard let email = emailTextField.text, let password = passwordTextField.text else {
-            print("Form is not valid")
-            return
-        }
-        FIRAuth.auth()?.signIn(withEmail: email, password: password, completion: { (user, error) in
-        
-            if error != nil {
-                print("\(error)")
-                return
-            }
-            //succesfully logged in our user
-            print("user succesfully loged in")
-            self.dismiss(animated: true, completion: nil)
-        })
-    }
-    
-    func handleRegister() {
-        
-        guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
-            print("form is not valid")
-            return
-        }
-        FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: { (user: FIRUser?, error) in
-            if error != nil {
-                print("The error is: \(error) that email is \(email) and pws is \(password)")
-                return
-            }
-            //success authenticated, save user now
-            //workchat-fc8ab reference father in the console
-            let ref = FIRDatabase.database().reference(fromURL: "https://workchat-fc8ab.firebaseio.com/")
-            
-            //creating a child reference using as a childe node the userID
-            guard let uid = user?.uid else {
-                print("no uid")
-                return
-            }
-            let usersReference = ref.child("users").child(uid) //userID
-            let values = ["name": name, "email" : email]
-            usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
-                
-                if err != nil {
-                    print("\(err)")
-                    return
-                }
-                //succesfully saved in DB
-                self.dismiss(animated: true, completion: nil)
-                print("saved user succesfully in to firebase DB")
-            })
-        })
-    }
-}
-
 
 extension UIColor {
     

@@ -92,6 +92,7 @@
 				7B3727B61E3805FF001299F1 /* BrianChat.entitlements */,
 				7B68FFF21E36EC7400685D40 /* AppDelegate.swift */,
 				7B6800041E36EE6C00685D40 /* LoginVC.swift */,
+				7B3727C11E382917001299F1 /* LoginVC+handlers.swift */,
 				7B68FFF41E36EC7400685D40 /* MessagesVC.swift */,
 				7B3727BB1E381130001299F1 /* NewMessageVC.swift */,
 				7B68FFF61E36EC7400685D40 /* Main.storyboard */,
@@ -100,7 +101,6 @@
 				7B6800061E37032D00685D40 /* GoogleService-Info.plist */,
 				7B68FFFE1E36EC7400685D40 /* Info.plist */,
 				7B3727BD1E381740001299F1 /* User.swift */,
-				7B3727C11E382917001299F1 /* LoginVC+handlers.swift */,
 			);
 			path = BrianChat;
 			sourceTree = "<group>";

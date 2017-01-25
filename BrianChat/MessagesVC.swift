@@ -24,6 +24,11 @@ class MessagesVC : UITableViewController {
         checkIfUserIsLoggedIn()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        checkIfUserIsLoggedIn()
+    }
+    
     func checkIfUserIsLoggedIn() {
         if FIRAuth.auth()?.currentUser?.uid == nil {
             //adding a delay to present the vc
