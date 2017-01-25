@@ -18,6 +18,7 @@
 		7B68FFF81E36EC7400685D40 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B68FFF61E36EC7400685D40 /* Main.storyboard */; };
 		7B68FFFA1E36EC7400685D40 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B68FFF91E36EC7400685D40 /* Assets.xcassets */; };
 		7B68FFFD1E36EC7400685D40 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B68FFFB1E36EC7400685D40 /* LaunchScreen.storyboard */; };
+		7BB6FAAD1E395033009E8D06 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB6FAAC1E395033009E8D06 /* Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		7B68FFF91E36EC7400685D40 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7B68FFFC1E36EC7400685D40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7B68FFFE1E36EC7400685D40 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7BB6FAAC1E395033009E8D06 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		9D0190BD92183797FCF33C2C /* Pods-BrianChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BrianChat.release.xcconfig"; path = "Pods/Target Support Files/Pods-BrianChat/Pods-BrianChat.release.xcconfig"; sourceTree = "<group>"; };
 		D17A3F8DE7F1335EC76729D5 /* Pods_BrianChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BrianChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -89,6 +91,7 @@
 		7B68FFF11E36EC7400685D40 /* BrianChat */ = {
 			isa = PBXGroup;
 			children = (
+				7BB6FAAB1E395026009E8D06 /* Helpers */,
 				7B3727B61E3805FF001299F1 /* BrianChat.entitlements */,
 				7B68FFF21E36EC7400685D40 /* AppDelegate.swift */,
 				7B6800041E36EE6C00685D40 /* LoginVC.swift */,
@@ -103,6 +106,14 @@
 				7B3727BD1E381740001299F1 /* User.swift */,
 			);
 			path = BrianChat;
+			sourceTree = "<group>";
+		};
+		7BB6FAAB1E395026009E8D06 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				7BB6FAAC1E395033009E8D06 /* Extensions.swift */,
+			);
+			name = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -241,6 +252,7 @@
 				7B68FFF31E36EC7400685D40 /* AppDelegate.swift in Sources */,
 				7B3727BE1E381740001299F1 /* User.swift in Sources */,
 				7B6800051E36EE6C00685D40 /* LoginVC.swift in Sources */,
+				7BB6FAAD1E395033009E8D06 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

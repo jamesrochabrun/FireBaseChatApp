@@ -37,7 +37,8 @@ class NewMessageVC: UITableViewController {
                     let user = User()
                     user.name = name
                     user.email = email
-                    print("\(user.name) : \(user.email)")
+                    user.profileImageURL = dictionary["profileImageURL"] as? String
+                    print("\(user.name) : \(user.email) : \(user.profileImageURL)")
                     self.users.append(user)
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
@@ -63,15 +64,50 @@ class NewMessageVC: UITableViewController {
         let user = users[indexPath.row]
         cell.textLabel?.text = user.name
         cell.detailTextLabel?.text = user.email
+        if let userProfileImageURL = user.profileImageURL {
+            cell.profileImageView.loadImageUsingCacheWithURLString(userProfileImageURL)
+        }
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 72
     }
 
 }
 
 class UserCell: UITableViewCell {
     
+    let profileImageView: UIImageView = {
+        let imageview = UIImageView()
+        imageview.translatesAutoresizingMaskIntoConstraints = false
+        imageview.layer.cornerRadius = 24
+        imageview.layer.masksToBounds = true
+        imageview.contentMode = .scaleAspectFill
+        return imageview
+    }()
+    
+    
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
+        addSubview(profileImageView)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if let textLabel = self.textLabel {
+           self.textLabel?.frame = CGRect(x: 64, y: (textLabel.frame.origin.y - 2), width: (textLabel.frame.size.width), height: (textLabel.frame.size.height))
+        }
+        
+        if let detailTextLabel = self.detailTextLabel {
+            self.detailTextLabel?.frame = CGRect(x: 64, y: (detailTextLabel.frame.origin.y + 2), width: (detailTextLabel.frame.size.width), height: (detailTextLabel.frame.size.height))
+        }
+        
+        profileImageView.leftAnchor.constraint(equalTo: self.leftAnchor, constant:8).isActive = true
+        profileImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 48).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 48).isActive = true
     }
     
     required init?(coder aDecoder: NSCoder) {
