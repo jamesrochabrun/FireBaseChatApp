@@ -8,10 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		633B73F8D41D838724DE0426 /* Pods_BrianChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D17A3F8DE7F1335EC76729D5 /* Pods_BrianChat.framework */; };
+		7B3727BC1E381130001299F1 /* NewMessageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3727BB1E381130001299F1 /* NewMessageVC.swift */; };
+		7B3727BE1E381740001299F1 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3727BD1E381740001299F1 /* User.swift */; };
+		7B3727C21E382917001299F1 /* LoginVC+handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3727C11E382917001299F1 /* LoginVC+handlers.swift */; };
 		7B6800051E36EE6C00685D40 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6800041E36EE6C00685D40 /* LoginVC.swift */; };
 		7B6800071E37032D00685D40 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7B6800061E37032D00685D40 /* GoogleService-Info.plist */; };
 		7B68FFF31E36EC7400685D40 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B68FFF21E36EC7400685D40 /* AppDelegate.swift */; };
-		7B68FFF51E36EC7400685D40 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B68FFF41E36EC7400685D40 /* ViewController.swift */; };
+		7B68FFF51E36EC7400685D40 /* MessagesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B68FFF41E36EC7400685D40 /* MessagesVC.swift */; };
 		7B68FFF81E36EC7400685D40 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B68FFF61E36EC7400685D40 /* Main.storyboard */; };
 		7B68FFFA1E36EC7400685D40 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B68FFF91E36EC7400685D40 /* Assets.xcassets */; };
 		7B68FFFD1E36EC7400685D40 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B68FFFB1E36EC7400685D40 /* LaunchScreen.storyboard */; };
@@ -20,11 +23,14 @@
 /* Begin PBXFileReference section */
 		2A664DD643E40A0966D51B2E /* Pods-BrianChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BrianChat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BrianChat/Pods-BrianChat.debug.xcconfig"; sourceTree = "<group>"; };
 		7B3727B61E3805FF001299F1 /* BrianChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrianChat.entitlements; sourceTree = "<group>"; };
+		7B3727BB1E381130001299F1 /* NewMessageVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewMessageVC.swift; sourceTree = "<group>"; };
+		7B3727BD1E381740001299F1 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		7B3727C11E382917001299F1 /* LoginVC+handlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginVC+handlers.swift"; sourceTree = "<group>"; };
 		7B6800041E36EE6C00685D40 /* LoginVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		7B6800061E37032D00685D40 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7B68FFEF1E36EC7400685D40 /* BrianChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrianChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B68FFF21E36EC7400685D40 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		7B68FFF41E36EC7400685D40 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		7B68FFF41E36EC7400685D40 /* MessagesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesVC.swift; sourceTree = "<group>"; };
 		7B68FFF71E36EC7400685D40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7B68FFF91E36EC7400685D40 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7B68FFFC1E36EC7400685D40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -86,12 +92,15 @@
 				7B3727B61E3805FF001299F1 /* BrianChat.entitlements */,
 				7B68FFF21E36EC7400685D40 /* AppDelegate.swift */,
 				7B6800041E36EE6C00685D40 /* LoginVC.swift */,
-				7B68FFF41E36EC7400685D40 /* ViewController.swift */,
+				7B68FFF41E36EC7400685D40 /* MessagesVC.swift */,
+				7B3727BB1E381130001299F1 /* NewMessageVC.swift */,
 				7B68FFF61E36EC7400685D40 /* Main.storyboard */,
 				7B68FFF91E36EC7400685D40 /* Assets.xcassets */,
 				7B68FFFB1E36EC7400685D40 /* LaunchScreen.storyboard */,
 				7B6800061E37032D00685D40 /* GoogleService-Info.plist */,
 				7B68FFFE1E36EC7400685D40 /* Info.plist */,
+				7B3727BD1E381740001299F1 /* User.swift */,
+				7B3727C11E382917001299F1 /* LoginVC+handlers.swift */,
 			);
 			path = BrianChat;
 			sourceTree = "<group>";
@@ -226,8 +235,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B68FFF51E36EC7400685D40 /* ViewController.swift in Sources */,
+				7B68FFF51E36EC7400685D40 /* MessagesVC.swift in Sources */,
+				7B3727C21E382917001299F1 /* LoginVC+handlers.swift in Sources */,
+				7B3727BC1E381130001299F1 /* NewMessageVC.swift in Sources */,
 				7B68FFF31E36EC7400685D40 /* AppDelegate.swift in Sources */,
+				7B3727BE1E381740001299F1 /* User.swift in Sources */,
 				7B6800051E36EE6C00685D40 /* LoginVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
