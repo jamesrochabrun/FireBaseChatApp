@@ -24,25 +24,27 @@ class MessagesVC : UITableViewController {
         checkIfUserIsLoggedIn()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        checkIfUserIsLoggedIn()
-    }
-    
     func checkIfUserIsLoggedIn() {
         if FIRAuth.auth()?.currentUser?.uid == nil {
             //adding a delay to present the vc
             perform(#selector(handleLogout), with: nil, afterDelay: 0)
         } else { //2 user is logged in
-            //fetch a single value
-            if  let uid = FIRAuth.auth()?.currentUser?.uid {
-                FIRDatabase.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
-                    if let dictionary = snapshot.value as? [String: AnyObject] {
-                        self.navigationItem.title = dictionary["name"] as? String
-                    }
-                })
-            }
+           fetchUserAndSetUpNavBarTitle()
         }
+    }
+    
+    func fetchUserAndSetUpNavBarTitle() {
+        
+        //fetch a single value
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else {
+            print("uid is nil in fetchuserandsetupnavbartitle method")
+            return
+        }
+        FIRDatabase.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                self.navigationItem.title = dictionary["name"] as? String
+            }
+        })
     }
     
     //this gets triggered when the user logs out tapping the button in the lef top corner
@@ -54,6 +56,7 @@ class MessagesVC : UITableViewController {
             print(logoutError)
         }
         let loginVC = LoginVC()
+        loginVC.messagesVC = self
         self.present(loginVC, animated: true, completion: nil)
     }
     

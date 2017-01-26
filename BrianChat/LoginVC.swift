@@ -10,6 +10,8 @@ import UIKit
 
 class LoginVC: UIViewController {
     
+    var messagesVC: MessagesVC?
+    
     //MARK: Properties
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent

@@ -29,9 +29,11 @@ extension LoginVC: UIImagePickerControllerDelegate, UINavigationControllerDelega
         FIRAuth.auth()?.signIn(withEmail: email, password: password, completion: { (user, error) in
             
             if error != nil {
-                print("\(error)")
+                print("ERROR IN HANDLELOGIN METHOD:\(error)")
                 return
             }
+            //updating navbartitle
+            self.messagesVC?.fetchUserAndSetUpNavBarTitle()
             //succesfully logged in our user
             print("user succesfully logged in")
             self.dismiss(animated: true, completion: nil)
@@ -88,12 +90,15 @@ extension LoginVC: UIImagePickerControllerDelegate, UINavigationControllerDelega
         let usersReference = ref.child("users").child(uid) //userID
         usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
             if err != nil {
-                print("\(err)")
+                print("ERROR: SAVING IN DB: \(err)")
                 return
             }
+            //update navTitle
+            self.messagesVC?.navigationItem.title = values["name"] as? String           // self.messagesVC?.fetchUserAndSetUpNavBarTitle()
+            
             //succesfully saved in DB
             self.dismiss(animated: true, completion: nil)
-            print("saved user succesfully in to firebase DB")
+            print("user saved/registered succesfully in to firebase DB")
         })
     }
     
