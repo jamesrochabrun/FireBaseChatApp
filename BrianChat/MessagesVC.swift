@@ -47,7 +47,6 @@ class MessagesVC : UITableViewController {
                 user.setValuesForKeys(dictionary)
                 self.setUpNavBarWithUser(user: user)
                 
-                
             }
         })
     }
@@ -80,7 +79,7 @@ class MessagesVC : UITableViewController {
         
         let containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.backgroundColor = #colorLiteral(red: 0.9254902005, green: 0.2352941185, blue: 0.1019607857, alpha: 1)
+        //containerView.backgroundColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
         titleView.addSubview(containerView)
         
         let profileImageView = UIImageView()
@@ -103,7 +102,7 @@ class MessagesVC : UITableViewController {
         
         let nameLabel = UILabel()
         containerView.addSubview(nameLabel)
-        nameLabel.text = "jajoajaojaojaojojoajaoajaojaj"//user.name
+        nameLabel.text = user.name
         print("username: \(user.name)")
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -114,7 +113,6 @@ class MessagesVC : UITableViewController {
         
         containerView.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
         containerView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
-        
         
         self.navigationItem.titleView = titleView
     }

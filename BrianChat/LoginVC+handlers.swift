@@ -107,7 +107,10 @@ extension LoginVC: UIImagePickerControllerDelegate, UINavigationControllerDelega
                 return
             }
             //update navTitle
-            self.messagesVC?.navigationItem.title = values["name"] as? String           // self.messagesVC?.fetchUserAndSetUpNavBarTitle()
+            let user = User()
+            //this setter crashes if keys dont match 
+            user.setValuesForKeys(values)
+            self.messagesVC?.setUpNavBarWithUser(user: user)
             
             //succesfully saved in DB
             self.dismiss(animated: true, completion: nil)
