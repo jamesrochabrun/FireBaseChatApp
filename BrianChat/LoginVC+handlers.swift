@@ -60,24 +60,37 @@ extension LoginVC: UIImagePickerControllerDelegate, UINavigationControllerDelega
             //create a storage ref for the image
             //uniquestring
             let imageName = NSUUID().uuidString
-            let storageRef = FIRStorage.storage().reference().child("profile_images").child("\(imageName).png")
-            if let image = self.profileImageView.image {
-                if let uploadData =  UIImagePNGRepresentation(image) {
-                    storageRef.put(uploadData, metadata: nil, completion: { (metadata, error) in
-                        if error != nil {
-                            print("\(error)")
-                            return
-                        }
-                        if let profileImageURL = metadata?.downloadURL()?.absoluteString {
-                            let values = ["name": name, "email" : email, "profileImageURL": profileImageURL]
-                            //register after send image in to storage
-                            self.registerUserInToDB(withValuesDict: values as [String : AnyObject], andUID: uid)
-                        }
-                    })
-                }
+            let storageRef = FIRStorage.storage().reference().child("profile_images").child("\(imageName).jpg")
+           
+            if let image = self.profileImageView.image, let uploadData = UIImageJPEGRepresentation(image, 0.1) {
+                storageRef.put(uploadData, metadata: nil, completion: { (metadata, error) in
+                    if error != nil {
+                        print("\(error)")
+                        return
+                    }
+                    if let profileImageURL = metadata?.downloadURL()?.absoluteString {
+                        let values = ["name": name, "email" : email, "profileImageURL": profileImageURL]
+                        //register after send image in to storage
+                        self.registerUserInToDB(withValuesDict: values as [String : AnyObject], andUID: uid)
+                    }
+                })
             }
         })
     }
+    
+    /* 
+     storageRef.put(uploadData, metadata: nil, completion: { (metadata, error) in
+     if error != nil {
+     print("\(error)")
+     return
+     }
+     if let profileImageURL = metadata?.downloadURL()?.absoluteString {
+     let values = ["name": name, "email" : email, "profileImageURL": profileImageURL]
+     //register after send image in to storage
+     self.registerUserInToDB(withValuesDict: values as [String : AnyObject], andUID: uid)
+     }
+     })
+     */
     
     private func registerUserInToDB(withValuesDict values:[String: AnyObject], andUID uid:String) {
         
