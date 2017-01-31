@@ -13,6 +13,8 @@ class NewMessageVC: UITableViewController {
     
     let cellID = "cell"
     var users: [User] = []
+    var messagesVC: MessagesVC?
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +39,7 @@ class NewMessageVC: UITableViewController {
                     let user = User()
                     user.name = name
                     user.email = email
+                    user.id = snapshot.key //id
                     user.profileImageURL = dictionary["profileImageURL"] as? String
                     print("\(user.name) : \(user.email) : \(user.profileImageURL)")
                     self.users.append(user)
@@ -49,7 +52,6 @@ class NewMessageVC: UITableViewController {
             }
         })
     }
-
 
     // MARK: - Table view data source
 
@@ -73,7 +75,16 @@ class NewMessageVC: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 72
     }
+    
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
+        dismiss(animated: true) {
+            
+            let user = self.users[indexPath.row]
+            self.messagesVC?.showChatVCForUser(user)
+        }
+    }
 }
 
 class UserCell: UITableViewCell {

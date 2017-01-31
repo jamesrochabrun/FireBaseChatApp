@@ -11,6 +11,12 @@ import Firebase
 
 class ChatLogVC: UICollectionViewController {
     
+    var user: User? {
+        didSet {
+          navigationItem.title = user?.name
+        }
+    }
+    
     lazy var inputTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Enter message"
@@ -21,7 +27,6 @@ class ChatLogVC: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "Chat log controller"
         collectionView?.backgroundColor = UIColor.white
         setUpInputComponents()
         
@@ -69,14 +74,21 @@ class ChatLogVC: UICollectionViewController {
     ///////handlers
     func handleSend() {
         
+        //creating a reference to the parent node
         let reference = FIRDatabase.database().reference().child("messages")
         //creating a child node with unique ID
         let childRef = reference.childByAutoId()
-        let values = ["text" : inputTextField.text]
-        childRef.updateChildValues(values)
+        let timeStamp:Int = Int(NSDate().timeIntervalSince1970)
+        //the user logged in
+        //to the user that the message was sent
+        if let fromID = FIRAuth.auth()?.currentUser?.uid, let toID = self.user?.id {
+            let values = ["text" : inputTextField.text!, "toID" : toID, "fromID" : fromID, "timeStamp" : timeStamp] as [String : Any]
+            childRef.updateChildValues(values)
+        } else {
+            print("PROBLEM SENDING MESSAGE")    
+        }
     }
 }
-
 
 
 extension ChatLogVC: UITextFieldDelegate {

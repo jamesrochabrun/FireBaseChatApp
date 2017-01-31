@@ -11,10 +11,13 @@ import Firebase
 
 class MessagesVC : UITableViewController {
     
+    var messageArray = [Message]()
+    let cellID = "cell"
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
     
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         
@@ -28,6 +31,28 @@ class MessagesVC : UITableViewController {
         //checking if user is logged
         //1 user ins not logged in or he logged out
         checkIfUserIsLoggedIn()
+        observeMessagesUpdate()
+    }
+    
+    func observeMessagesUpdate() {
+        let reference = FIRDatabase.database().reference().child("messages")
+        reference.observe(.childAdded, with: { (snapshot) in
+            
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                
+                let message = Message()
+                message.text = dictionary["text"] as? String
+                message.fromID = dictionary["fromID"] as? String
+                message.toID = dictionary["toID"] as? String
+                message.timeStamp = dictionary["timeStamp"] as? Int
+                self.messageArray.append(message)
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            }
+        }) { (error) in
+            print("ERROR: \(error)")
+        }
     }
     
     func checkIfUserIsLoggedIn() {
@@ -72,6 +97,7 @@ class MessagesVC : UITableViewController {
     
     func handleNewMessage() {
         let newMessageVC = NewMessageVC()
+        newMessageVC.messagesVC = self
         //add a navigation controller
         let navController = UINavigationController(rootViewController: newMessageVC)
         present(navController, animated: true, completion: nil)
@@ -122,13 +148,33 @@ class MessagesVC : UITableViewController {
         
         self.navigationItem.titleView = titleView
         
-        titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatVC)))
+        titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showProfile)))
     }
     
-    func showChatVC() {
+    func showChatVCForUser(_ user: User) {
         print("show chat")
         let chatLogVC = ChatLogVC(collectionViewLayout: UICollectionViewFlowLayout())
+        chatLogVC.user = user
         navigationController?.pushViewController(chatLogVC, animated: true)
+    }
+    
+    func showProfile() {
+        
+    }
+}
+
+extension MessagesVC {
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellID , for: indexPath)
+        let message = messageArray[indexPath.row]
+        cell.textLabel?.text = message.fromID
+        return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return messageArray.count
     }
 }
 
