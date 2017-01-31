@@ -12,7 +12,7 @@ class Message: NSObject {
     
     var fromID: String?
     var text: String?
-    var timeStamp: Int?
+    var timeStamp: NSNumber?
     var toID: String?
 
 }

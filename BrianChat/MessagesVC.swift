@@ -17,7 +17,7 @@ class MessagesVC : UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
+        tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
     
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         
@@ -44,7 +44,7 @@ class MessagesVC : UITableViewController {
                 message.text = dictionary["text"] as? String
                 message.fromID = dictionary["fromID"] as? String
                 message.toID = dictionary["toID"] as? String
-                message.timeStamp = dictionary["timeStamp"] as? Int
+                message.timeStamp = dictionary["timeStamp"] as? NSNumber
                 self.messageArray.append(message)
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
@@ -167,10 +167,14 @@ extension MessagesVC {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellID , for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellID , for: indexPath) as! UserCell
         let message = messageArray[indexPath.row]
-        cell.textLabel?.text = message.fromID
+        cell.message = message
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 72
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

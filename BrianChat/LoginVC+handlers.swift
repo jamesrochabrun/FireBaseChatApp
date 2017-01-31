@@ -78,26 +78,11 @@ extension LoginVC: UIImagePickerControllerDelegate, UINavigationControllerDelega
         })
     }
     
-    /* 
-     storageRef.put(uploadData, metadata: nil, completion: { (metadata, error) in
-     if error != nil {
-     print("\(error)")
-     return
-     }
-     if let profileImageURL = metadata?.downloadURL()?.absoluteString {
-     let values = ["name": name, "email" : email, "profileImageURL": profileImageURL]
-     //register after send image in to storage
-     self.registerUserInToDB(withValuesDict: values as [String : AnyObject], andUID: uid)
-     }
-     })
-     */
-    
     private func registerUserInToDB(withValuesDict values:[String: AnyObject], andUID uid:String) {
         
         // save user now
         //workchat-fc8ab reference father in the console
-        let ref = FIRDatabase.database().reference(fromURL: "https://workchat-fc8ab.firebaseio.com/")
-        
+        let ref = FIRDatabase.database().reference()
         //the keys of the values dictionary are provided by the developer
         //creating a child reference using as a child node the userID
         let usersReference = ref.child("users").child(uid) //userID

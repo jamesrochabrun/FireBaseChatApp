@@ -44,3 +44,13 @@ extension  UIImageView {
         }
     }
 }
+
+extension NSString {
+    
+    static func fromDateInSeconds(_ seconds: Double) -> String {
+        let timeStampDate = NSDate(timeIntervalSince1970: seconds)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "hh:mm:ss a"
+        return dateFormatter.string(from: timeStampDate as Date)
+    }
+}
