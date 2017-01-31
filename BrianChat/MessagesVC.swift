@@ -32,42 +32,53 @@ class MessagesVC : UITableViewController {
         //checking if user is logged
         //1 user ins not logged in or he logged out
         checkIfUserIsLoggedIn()
-        observeMessagesUpdate()
     }
     
-    func observeMessagesUpdate() {
-        let reference = FIRDatabase.database().reference().child("messages")
+    func observeUserMessages() {
+        
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else {
+            print("SOMETHING WENT WRONG WITH THE USER ID")
+            return
+        }
+        
+        let reference = FIRDatabase.database().reference().child("user-messages").child(uid)
         reference.observe(.childAdded, with: { (snapshot) in
             
-            if let dictionary = snapshot.value as? [String: AnyObject] {
+            //snapshot example uid key (which is the message id in the messages node) and value KbqRNVuDfgXN9vjGNqZ : 1
+            let messageID = snapshot.key
+            //getting the message from the usermessagenode.id , they are related
+            let messagesRef = FIRDatabase.database().reference().child("messages").child(messageID)
+            //getting the messages
+            messagesRef.observeSingleEvent(of: .value, with: { (snapshot) in
                 
-                let message = Message()
-                message.text = dictionary["text"] as? String
-                message.fromID = dictionary["fromID"] as? String
-                message.toID = dictionary["toID"] as? String
-                message.timeStamp = dictionary["timeStamp"] as? NSNumber
-                //toID returns the receiver id "name"
-                //creating a hash table to put all the messages of one user in one cell
-                //here we set the messages dictionary by adding the toiD as a key and the message as the value i.e
-                //["z1sYeFqQVvNLyvgQbnGxUsESsfu2": <BrianChat.Message: 0x6080000eef00>]
-                if let toID = message.toID {
-                    self.messagedictionary[toID] = message
-                    self.messageArray = Array(self.messagedictionary.values) as! [Message]
+                if let dictionary = snapshot.value as? [String: AnyObject] {
                     
-                    //Sorting ARRAY
-                    self.messageArray.sort(by: { (message1, message2) -> Bool in
-                        return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
-                    })
+                    let message = Message()
+                    message.text = dictionary["text"] as? String
+                    message.fromID = dictionary["fromID"] as? String
+                    message.toID = dictionary["toID"] as? String
+                    message.timeStamp = dictionary["timeStamp"] as? NSNumber
+                    //toID returns the receiver id "name"
+                    //creating a hash table to put all the messages of one user in one cell
+                    //here we set the messages dictionary by adding the toiD as a key and the message as the value i.e
+                    //["z1sYeFqQVvNLyvgQbnGxUsESsfu2": <BrianChat.Message: 0x6080000eef00>]
+                    if let toID = message.toID {
+                        self.messagedictionary[toID] = message
+                        self.messageArray = Array(self.messagedictionary.values) as! [Message]
+                        
+                        //Sorting ARRAY
+                        self.messageArray.sort(by: { (message1, message2) -> Bool in
+                            return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
+                        })
+                    }
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
                 }
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-            }
-        }) { (error) in
-            print("ERROR: \(error)")
-        }
+            })
+        }, withCancel: nil)
     }
+
     
     func checkIfUserIsLoggedIn() {
         if FIRAuth.auth()?.currentUser?.uid == nil {
@@ -118,6 +129,16 @@ class MessagesVC : UITableViewController {
     }
     
     func setUpNavBarWithUser(user: User) {
+        
+        //removing the past messages
+        messageArray.removeAll()
+        messagedictionary.removeAll()
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+        //updating messages by user
+        observeUserMessages()
+
         
         let titleView = UIView()
         titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)

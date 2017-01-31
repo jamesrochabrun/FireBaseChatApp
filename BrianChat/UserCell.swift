@@ -14,24 +14,34 @@ class UserCell: UITableViewCell {
     var message: Message? {
         didSet {
             detailTextLabel?.text = message?.text
-            
             if let seconds = message?.timeStamp?.doubleValue {
                 timeLabel.text = String.fromDateInSeconds(seconds)
             }
-            //here we are passing the meesage.toid value to get the user receiver based on that id
-            //remeber that the toid value comes from the user.id
-            if let toID = message?.toID {
-                let referenceUserID = FIRDatabase.database().reference().child("users").child(toID)
-                referenceUserID.observe(.value, with: { (snapshot) in
-                    //print(snapshot)
-                    if let dictionary = snapshot.value as? [String: AnyObject] {
-                        self.textLabel?.text = dictionary["name"] as? String
-                        if let userProfileImageURL = dictionary["profileImageURL"] as? String {
-                            self.profileImageView.loadImageUsingCacheWithURLString(userProfileImageURL)
-                        }
+            setUpNameAndProfileImage()
+        }
+    }
+    
+    private func setUpNameAndProfileImage() {
+        
+        let chatPartnerID: String?
+        
+        if message?.fromID == FIRAuth.auth()?.currentUser?.uid {
+            chatPartnerID = message?.toID
+        } else {
+            chatPartnerID = message?.fromID
+        }
+        
+        if let id = chatPartnerID {
+            let referenceUserID = FIRDatabase.database().reference().child("users").child(id)
+            referenceUserID.observe(.value, with: { (snapshot) in
+                //print(snapshot)
+                if let dictionary = snapshot.value as? [String: AnyObject] {
+                    self.textLabel?.text = dictionary["name"] as? String
+                    if let userProfileImageURL = dictionary["profileImageURL"] as? String {
+                        self.profileImageView.loadImageUsingCacheWithURLString(userProfileImageURL)
                     }
-                }, withCancel: nil)
-            }
+                }
+            }, withCancel: nil)
         }
     }
 

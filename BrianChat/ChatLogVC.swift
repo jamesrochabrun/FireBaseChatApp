@@ -77,15 +77,38 @@ class ChatLogVC: UICollectionViewController {
         //creating a reference to the parent node
         let reference = FIRDatabase.database().reference().child("messages")
         //creating a child node with unique ID
-        let childRef = reference.childByAutoId()
+        let childRef = reference.childByAutoId()//this creates a child in messages with a unique id
         let timeStamp:Int = Int(NSDate().timeIntervalSince1970)
         //the user logged in
         //to the user that the message was sent
         if let fromID = FIRAuth.auth()?.currentUser?.uid, let toID = self.user?.id {
             let values = ["text" : inputTextField.text!, "toID" : toID, "fromID" : fromID, "timeStamp" : timeStamp] as [String : Any]
-            childRef.updateChildValues(values)
+            // childRef.updateChildValues(values)
+            
+            //
+            childRef.updateChildValues(values, withCompletionBlock: { (error, snapshot) in
+                
+                if error != nil {
+                    print("ERROR IN HANDLESEND METHOD: \(error)")
+                }
+                //introducing a new root node  and one more inside it using the fromiD value as the new node title.
+                let userMessagesref = FIRDatabase.database().reference().child("user-messages").child(fromID)
+                let messagesID = childRef.key //getting the id which is the title of the subnode of messages
+                //then we update the new subnode with the reference to the message id as a key.
+                userMessagesref.updateChildValues([messagesID: 1])
+                //TREE: root
+                //user-messages
+                //fromID the sender
+                //reference to the message by id provided by this  reference.childByAutoId
+                
+                //NOW WE NEED TO BIND THE MESSAGE TO THE RECEPIENT or toID 
+                let recipientUserMessagesRef = FIRDatabase.database().reference().child("user-messages").child(toID)
+                recipientUserMessagesRef.updateChildValues([messagesID: 1])
+                
+            })
+            
         } else {
-            print("PROBLEM SENDING MESSAGE")    
+            print("PROBLEM SENDING MESSAGE IN HANDLESEND METHOD:")
         }
     }
 }
