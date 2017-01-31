@@ -12,6 +12,7 @@ import Firebase
 class MessagesVC : UITableViewController {
     
     var messageArray = [Message]()
+    var messagedictionary = [String: Any]()
     let cellID = "cell"
 
 
@@ -45,7 +46,20 @@ class MessagesVC : UITableViewController {
                 message.fromID = dictionary["fromID"] as? String
                 message.toID = dictionary["toID"] as? String
                 message.timeStamp = dictionary["timeStamp"] as? NSNumber
-                self.messageArray.append(message)
+                //toID returns the receiver id "name"
+                //creating a hash table to put all the messages of one user in one cell
+                //here we set the messages dictionary by adding the toiD as a key and the message as the value i.e
+                //["z1sYeFqQVvNLyvgQbnGxUsESsfu2": <BrianChat.Message: 0x6080000eef00>]
+                if let toID = message.toID {
+                    self.messagedictionary[toID] = message
+                    self.messageArray = Array(self.messagedictionary.values) as! [Message]
+                    
+                    //Sorting ARRAY
+                    self.messageArray.sort(by: { (message1, message2) -> Bool in
+                        return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
+                    })
+                }
+                
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
