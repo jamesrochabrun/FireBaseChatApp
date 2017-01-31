@@ -17,7 +17,13 @@ class MessagesVC : UITableViewController {
         // Do any additional setup after loading the view, typically from a nib.
     
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "editor"), style: .plain, target: self, action: #selector(handleNewMessage))
+        
+        let button: UIButton = UIButton(type: .custom)
+        button.setImage(#imageLiteral(resourceName: "editor"), for: UIControlState.normal)
+        button.addTarget(self, action: #selector(handleNewMessage), for: .touchUpInside)
+        button.frame = CGRect(x: 0, y: 0, width: 44, height: 44)
+        let barButton = UIBarButtonItem(customView: button)        
+        navigationItem.rightBarButtonItem = barButton
         
         //checking if user is logged
         //1 user ins not logged in or he logged out
@@ -41,12 +47,12 @@ class MessagesVC : UITableViewController {
             return
         }
         FIRDatabase.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
+            
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 
                 let user = User()
                 user.setValuesForKeys(dictionary)
                 self.setUpNavBarWithUser(user: user)
-                
             }
         })
     }
@@ -115,8 +121,15 @@ class MessagesVC : UITableViewController {
         containerView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
         
         self.navigationItem.titleView = titleView
+        
+        titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatVC)))
     }
     
+    func showChatVC() {
+        print("show chat")
+        let chatLogVC = ChatLogVC(collectionViewLayout: UICollectionViewFlowLayout())
+        navigationController?.pushViewController(chatLogVC, animated: true)
+    }
 }
 
 

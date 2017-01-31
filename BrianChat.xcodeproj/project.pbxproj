@@ -11,6 +11,7 @@
 		7B3727BC1E381130001299F1 /* NewMessageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3727BB1E381130001299F1 /* NewMessageVC.swift */; };
 		7B3727BE1E381740001299F1 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3727BD1E381740001299F1 /* User.swift */; };
 		7B3727C21E382917001299F1 /* LoginVC+handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3727C11E382917001299F1 /* LoginVC+handlers.swift */; };
+		7B6098F31E401C8F00986B31 /* ChatLogVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6098F21E401C8F00986B31 /* ChatLogVC.swift */; };
 		7B6800051E36EE6C00685D40 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6800041E36EE6C00685D40 /* LoginVC.swift */; };
 		7B6800071E37032D00685D40 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7B6800061E37032D00685D40 /* GoogleService-Info.plist */; };
 		7B68FFF31E36EC7400685D40 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B68FFF21E36EC7400685D40 /* AppDelegate.swift */; };
@@ -27,6 +28,7 @@
 		7B3727BB1E381130001299F1 /* NewMessageVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewMessageVC.swift; sourceTree = "<group>"; };
 		7B3727BD1E381740001299F1 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		7B3727C11E382917001299F1 /* LoginVC+handlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginVC+handlers.swift"; sourceTree = "<group>"; };
+		7B6098F21E401C8F00986B31 /* ChatLogVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatLogVC.swift; sourceTree = "<group>"; };
 		7B6800041E36EE6C00685D40 /* LoginVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		7B6800061E37032D00685D40 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7B68FFEF1E36EC7400685D40 /* BrianChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrianChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -70,6 +72,26 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		7B6098F01E401C3000986B31 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				7B6800041E36EE6C00685D40 /* LoginVC.swift */,
+				7B3727C11E382917001299F1 /* LoginVC+handlers.swift */,
+				7B68FFF41E36EC7400685D40 /* MessagesVC.swift */,
+				7B3727BB1E381130001299F1 /* NewMessageVC.swift */,
+				7B6098F21E401C8F00986B31 /* ChatLogVC.swift */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		7B6098F11E401C5800986B31 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				7B3727BD1E381740001299F1 /* User.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
 		7B68FFE61E36EC7400685D40 = {
 			isa = PBXGroup;
 			children = (
@@ -91,19 +113,16 @@
 		7B68FFF11E36EC7400685D40 /* BrianChat */ = {
 			isa = PBXGroup;
 			children = (
-				7BB6FAAB1E395026009E8D06 /* Helpers */,
-				7B3727B61E3805FF001299F1 /* BrianChat.entitlements */,
 				7B68FFF21E36EC7400685D40 /* AppDelegate.swift */,
-				7B6800041E36EE6C00685D40 /* LoginVC.swift */,
-				7B3727C11E382917001299F1 /* LoginVC+handlers.swift */,
-				7B68FFF41E36EC7400685D40 /* MessagesVC.swift */,
-				7B3727BB1E381130001299F1 /* NewMessageVC.swift */,
+				7B3727B61E3805FF001299F1 /* BrianChat.entitlements */,
+				7B6098F11E401C5800986B31 /* Model */,
+				7B6098F01E401C3000986B31 /* Controllers */,
+				7BB6FAAB1E395026009E8D06 /* Helpers */,
 				7B68FFF61E36EC7400685D40 /* Main.storyboard */,
 				7B68FFF91E36EC7400685D40 /* Assets.xcassets */,
 				7B68FFFB1E36EC7400685D40 /* LaunchScreen.storyboard */,
 				7B6800061E37032D00685D40 /* GoogleService-Info.plist */,
 				7B68FFFE1E36EC7400685D40 /* Info.plist */,
-				7B3727BD1E381740001299F1 /* User.swift */,
 			);
 			path = BrianChat;
 			sourceTree = "<group>";
@@ -251,6 +270,7 @@
 				7B3727BC1E381130001299F1 /* NewMessageVC.swift in Sources */,
 				7B68FFF31E36EC7400685D40 /* AppDelegate.swift in Sources */,
 				7B3727BE1E381740001299F1 /* User.swift in Sources */,
+				7B6098F31E401C8F00986B31 /* ChatLogVC.swift in Sources */,
 				7B6800051E36EE6C00685D40 /* LoginVC.swift in Sources */,
 				7BB6FAAD1E395033009E8D06 /* Extensions.swift in Sources */,
 			);
