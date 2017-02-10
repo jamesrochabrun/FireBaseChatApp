@@ -26,7 +26,7 @@ class LoginVC: UIViewController {
     //these are methods as properties
     let inputsContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        view.backgroundColor = .white
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = 5
         view.layer.masksToBounds = true

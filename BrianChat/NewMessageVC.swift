@@ -15,7 +15,6 @@ class NewMessageVC: UITableViewController {
     var users: [User] = []
     var messagesVC: MessagesVC?
 
-
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "cancel", style: .plain, target: self, action: #selector(handleCancel))

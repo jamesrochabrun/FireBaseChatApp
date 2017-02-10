@@ -11,12 +11,11 @@ import Foundation
 
 let imageCache = NSCache<NSString, UIImage>()
 
-
 extension  UIImageView {
     
     func loadImageUsingCacheWithURLString(_ URLString: String) {
         
-        //avoiding flashing
+        //avoiding flashing/ lag 
         self.image = nil
         //check cache for image first
         if let cachedImage = imageCache.object(forKey: NSString(string: URLString)) {

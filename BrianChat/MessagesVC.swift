@@ -187,7 +187,7 @@ class MessagesVC : UITableViewController {
     }
     
     func showChatVCForUser(_ user: User) {
-        print("show chat")
+        
         let chatLogVC = ChatLogVC(collectionViewLayout: UICollectionViewFlowLayout())
         chatLogVC.user = user
         navigationController?.pushViewController(chatLogVC, animated: true)
@@ -214,6 +214,26 @@ extension MessagesVC {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messageArray.count
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let message = messageArray[indexPath.row]
+        guard let chatPartnerID = message.checkPartenrID() else {
+            return
+        }
+        let ref = FIRDatabase.database().reference().child("users").child(chatPartnerID)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            
+            guard let dictionary = snapshot.value as? [String : AnyObject] else {
+                print("DIDSELECT NOT GIVING SNAPSHOT DATA FOR USERID")
+                return
+            }
+            let user = User()
+            user.id = chatPartnerID
+            user.setValuesForKeys(dictionary)
+            self.showChatVCForUser(user)
+        })
     }
 }
 
