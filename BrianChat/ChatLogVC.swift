@@ -173,12 +173,7 @@ extension ChatLogVC {//datasource
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! ChatMessageCell
         let message = self.messagesArray[indexPath.item]
-        
-        if let messageText = message.text {
-            cell.textView.text = messageText
-            //here we modify the width of the bubble using the reference of the width bubble constraint
-            cell.bubbleWidthAnchor?.constant = estimatedFrameForText(text: messageText).width + 32
-        }
+        cell.setUpCell(message: message)
         return cell
     }
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -192,20 +187,11 @@ extension ChatLogVC: UICollectionViewDelegateFlowLayout {
         
         var height: CGFloat = 80
         if let text = messagesArray[indexPath.item].text {
-            height = estimatedFrameForText(text: text).height + 20 ///this 20 is beacuse textview needs extra padding always
+            height = ChatMessageCell.estimatedFrameForText(text: text).height + 20 ///this 20 is beacuse textview needs extra padding always
         }
         return CGSize(width: view.frame.width, height: height)
     }
     
-    fileprivate func estimatedFrameForText(text: String) -> CGRect {
-        
-        //200 is the width of the textview inside the cell
-        //the font size is also related with the textview
-        let size = CGSize(width: 200, height: 1000)
-        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
-    
-        return NSString(string: text).boundingRect(with: size, options: options, attributes: [NSFontAttributeName : UIFont.systemFont(ofSize: 16)], context: nil)
-    }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         collectionView?.collectionViewLayout.invalidateLayout()
