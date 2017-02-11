@@ -70,6 +70,8 @@ class ChatLogVC: UICollectionViewController {
         collectionView?.backgroundColor = UIColor.white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellID)
         collectionView?.alwaysBounceVertical = true
+        collectionView?.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 58, right: 0)
+        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
         setUpInputComponents()
         
     }
@@ -134,6 +136,7 @@ class ChatLogVC: UICollectionViewController {
                 if error != nil {
                     print("ERROR IN HANDLESEND METHOD: \(error)")
                 }
+                self.inputTextField.text = nil
                 //introducing a new root node  and one more inside it using the fromiD value as the new node title.
                 let userMessagesref = FIRDatabase.database().reference().child("user-messages").child(fromID)
                 let messagesID = childRef.key //getting the id which is the title of the subnode of messages
@@ -165,20 +168,47 @@ extension ChatLogVC: UITextFieldDelegate {
     }
 }
 
-extension ChatLogVC: UICollectionViewDelegateFlowLayout {
+extension ChatLogVC {//datasource 
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! ChatMessageCell
         let message = self.messagesArray[indexPath.item]
-        cell.textView.text = message.text
+        
+        if let messageText = message.text {
+            cell.textView.text = messageText
+            //here we modify the width of the bubble using the reference of the width bubble constraint
+            cell.bubbleWidthAnchor?.constant = estimatedFrameForText(text: messageText).width + 32
+        }
         return cell
     }
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return messagesArray.count
     }
+}
+
+extension ChatLogVC: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 80)
+        
+        var height: CGFloat = 80
+        if let text = messagesArray[indexPath.item].text {
+            height = estimatedFrameForText(text: text).height + 20 ///this 20 is beacuse textview needs extra padding always
+        }
+        return CGSize(width: view.frame.width, height: height)
+    }
+    
+    fileprivate func estimatedFrameForText(text: String) -> CGRect {
+        
+        //200 is the width of the textview inside the cell
+        //the font size is also related with the textview
+        let size = CGSize(width: 200, height: 1000)
+        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+    
+        return NSString(string: text).boundingRect(with: size, options: options, attributes: [NSFontAttributeName : UIFont.systemFont(ofSize: 16)], context: nil)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        collectionView?.collectionViewLayout.invalidateLayout()
     }
     
     
