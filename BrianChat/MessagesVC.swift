@@ -14,6 +14,7 @@ class MessagesVC : UITableViewController {
     var messageArray = [Message]()
     var messagedictionary = [String: Any]()
     let cellID = "cell"
+    var timer: Timer?
 
 
     override func viewDidLoad() {
@@ -66,17 +67,25 @@ class MessagesVC : UITableViewController {
                         self.messagedictionary[chatPartnerID] = message
                         self.messageArray = Array(self.messagedictionary.values) as! [Message]
                         
-                        //Sorting ARRAY
+                        //Sorting ARRAY based on timestamp
                         self.messageArray.sort(by: { (message1, message2) -> Bool in
                             return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
                         })
+                        //avoiding to reload the table multiple times HACK
+                        self.timer?.invalidate()
+                        self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
                     }
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                    }
+        
                 }
             })
         }, withCancel: nil)
+    }
+    
+    func handleReloadTable() {
+        DispatchQueue.main.async {
+            print("reloading table")
+            self.tableView.reloadData()
+        }
     }
 
     

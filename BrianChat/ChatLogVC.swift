@@ -173,7 +173,7 @@ extension ChatLogVC {//datasource
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! ChatMessageCell
         let message = self.messagesArray[indexPath.item]
-        cell.setUpCell(message: message)
+        cell.setUpCell(message: message, user: self.user)
         return cell
     }
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

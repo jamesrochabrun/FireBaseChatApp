@@ -30,7 +30,9 @@ class ChatMessageCell: UICollectionViewCell {
         let tv = UITextView()
         tv.font = UIFont.systemFont(ofSize: 16)
         tv.backgroundColor = .clear
-        tv.textColor = .white
+        tv.isUserInteractionEnabled = false
+        tv.isScrollEnabled = false
+        tv.showsVerticalScrollIndicator = false
         tv.translatesAutoresizingMaskIntoConstraints = false
         return tv
     }()
@@ -92,13 +94,17 @@ class ChatMessageCell: UICollectionViewCell {
         return NSString(string: text).boundingRect(with: size, options: options, attributes: [NSFontAttributeName : UIFont.systemFont(ofSize: 16)], context: nil)
     }
         
-    func setUpCell(message: Message) {
+    func setUpCell(message: Message, user: User?) {
+        
+        if let profileImageURL = user?.profileImageURL {
+            profileImageView.loadImageUsingCacheWithURLString(profileImageURL)
+        }
         
         if message.fromID == FIRAuth.auth()?.currentUser?.uid {
             //blue outgoing user logged in
             bubbleView.backgroundColor = ChatMessageCell.blueColor
             textView.textColor = .white
-            profileImageView.isHidden = false
+            profileImageView.isHidden = true
             bubbleViewRightAnchor?.isActive = true
             bubbleViewLefttAnchor?.isActive = false
         } else {
@@ -107,7 +113,7 @@ class ChatMessageCell: UICollectionViewCell {
             textView.textColor = .black
             bubbleViewRightAnchor?.isActive = false
             bubbleViewLefttAnchor?.isActive = true
-            profileImageView.isHidden = true
+            profileImageView.isHidden = false
         }
         if let messageText = message.text {
             textView.text = messageText
