@@ -38,6 +38,17 @@ class ChatLogVC: UICollectionViewController {
         containerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50)
         containerView.backgroundColor = UIColor.white
         
+        let uploadImageView = UIImageView()
+        uploadImageView.translatesAutoresizingMaskIntoConstraints = false
+        uploadImageView.image = UIImage(named: "editor")
+        uploadImageView.isUserInteractionEnabled = true
+        uploadImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleUploadTab)))
+        containerView.addSubview(uploadImageView)
+        uploadImageView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
+        uploadImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        uploadImageView.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        uploadImageView.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        
         let sendButton = UIButton(type: .system)
         sendButton.setTitle("SEND", for: .normal)
         sendButton.addTarget(self, action: #selector(handleSend), for: .touchUpInside)
@@ -49,7 +60,7 @@ class ChatLogVC: UICollectionViewController {
         sendButton.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
         
         containerView.addSubview(self.inputTextField)
-        self.inputTextField.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 8).isActive = true
+        self.inputTextField.leftAnchor.constraint(equalTo: uploadImageView.rightAnchor, constant: 8).isActive = true
         self.inputTextField.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
         self.inputTextField.rightAnchor.constraint(equalTo: sendButton.leftAnchor).isActive = true
         self.inputTextField.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
@@ -75,6 +86,8 @@ class ChatLogVC: UICollectionViewController {
     override var canBecomeFirstResponder: Bool {
         return true
     }
+    //MARK: using inputaccesoryview for the keyboard end
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,8 +95,9 @@ class ChatLogVC: UICollectionViewController {
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellID)
         collectionView?.alwaysBounceVertical = true
         collectionView?.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
-//        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
         collectionView?.keyboardDismissMode = .interactive
+        //UNCOMMENT THIS IF WE WANT TO SWITCH TO REGULAR KEYBOARD APPEREANCE
+        //collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
         //setUpInputComponents()
         //setUpKeyboardObservers()
     }
@@ -96,16 +110,18 @@ class ChatLogVC: UICollectionViewController {
     func observeMessages() {
         
         //observe messages from the logged in user
-        guard let uid = FIRAuth.auth()?.currentUser?.uid else {
+        guard let uid = FIRAuth.auth()?.currentUser?.uid, let toID = user?.id else {
             return
         }
-        let userMessagesRef = FIRDatabase.database().reference().child("user-messages").child(uid)
+        let userMessagesRef = FIRDatabase.database().reference().child("user-messages").child(uid).child(toID)
         userMessagesRef.observe(.childAdded, with: { (snapshot) in
             
             let messageID = snapshot.key
             let messagesRef = FIRDatabase.database().reference().child("messages").child(messageID)
             
             messagesRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                
+                print(snapshot)
                 
                 guard let dictionary = snapshot.value as? [String : AnyObject] else {
                     print("SNAPSHOT VALUE FROM CHATLOG ERROR")
@@ -117,12 +133,9 @@ class ChatLogVC: UICollectionViewController {
                 //filtering messages
                 //self.user.id is the user that we clicked on
                 //message.checkparter is the FromID which means is the sender user id
-                if message.checkPartenrID() == self.user?.id {
-                    
-                    self.messagesArray.append(message)
-                    DispatchQueue.main.async {
-                        self.collectionView?.reloadData()
-                    }
+                self.messagesArray.append(message)
+                DispatchQueue.main.async {
+                    self.collectionView?.reloadData()
                 }
             })
         })
@@ -150,7 +163,7 @@ class ChatLogVC: UICollectionViewController {
                 }
                 self.inputTextField.text = nil
                 //introducing a new root node  and one more inside it using the fromiD value as the new node title.
-                let userMessagesref = FIRDatabase.database().reference().child("user-messages").child(fromID)
+                let userMessagesref = FIRDatabase.database().reference().child("user-messages").child(fromID).child(toID)
                 let messagesID = childRef.key //getting the id which is the title of the subnode of messages
                 //then we update the new subnode with the reference to the message id as a key.
                 userMessagesref.updateChildValues([messagesID: 1])
@@ -160,7 +173,86 @@ class ChatLogVC: UICollectionViewController {
                 //reference to the message by id provided by this  reference.childByAutoId
                 
                 //NOW WE NEED TO BIND THE MESSAGE TO THE RECEPIENT or toID 
-                let recipientUserMessagesRef = FIRDatabase.database().reference().child("user-messages").child(toID)
+                let recipientUserMessagesRef = FIRDatabase.database().reference().child("user-messages").child(toID).child(fromID)
+                recipientUserMessagesRef.updateChildValues([messagesID: 1])
+                
+            })
+            
+        } else {
+            print("PROBLEM SENDING MESSAGE IN HANDLESEND METHOD:")
+        }
+    }
+}
+
+//MARK: UIIMAGEPICKER IMPLEMENTATIO STEP BY STEP
+extension ChatLogVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func handleUploadTab() {
+        //BASIC STEPS FOR UIIMAGEPICKER
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = self
+        present(imagePickerController, animated: true)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        
+        var selectedImageFromPicker: UIImage?
+        
+        if let editedImage = info["UIImagePickerControllerEditedImage"] as? UIImage {
+            selectedImageFromPicker = editedImage
+        } else if let originalImage = info["UIImagePickerControllerOriginalImage"] as? UIImage {
+            selectedImageFromPicker = originalImage
+        }
+        
+        if let selectedImage = selectedImageFromPicker {
+            uploadToFirebaseStorageUsingImage(selectedImage)
+        }
+    }
+    
+    private func uploadToFirebaseStorageUsingImage(_ image: UIImage) {
+        
+        let imageName = NSUUID().uuidString
+        let ref = FIRStorage.storage().reference().child("messages_images").child(imageName)
+        
+        if let uploadData = UIImageJPEGRepresentation(image, 0.2) {
+            ref.put(uploadData, metadata: nil, completion: { (metadata, error) in
+                if error != nil {
+                    print("FAILED TO UPLOAD IMAGE")
+                    return
+                }
+                
+                if let imageURL = metadata?.downloadURL()?.absoluteString {
+                    self.sendMessageWith(imageURL: imageURL)
+                }
+            })
+        }
+        dismiss(animated: true, completion: nil)
+    }
+    
+    private func sendMessageWith(imageURL: String) {
+        
+        let reference = FIRDatabase.database().reference().child("messages")
+        let childRef = reference.childByAutoId()
+        let timeStamp:Int = Int(NSDate().timeIntervalSince1970)
+
+        if let fromID = FIRAuth.auth()?.currentUser?.uid, let toID = self.user?.id {
+            let values = ["imageURL" : imageURL, "toID" : toID, "fromID" : fromID, "timeStamp" : timeStamp] as [String : Any]
+
+            childRef.updateChildValues(values, withCompletionBlock: { (error, snapshot) in
+                
+                if error != nil {
+                    print("ERROR IN HANDLESEND METHOD: \(error)")
+                }
+                self.inputTextField.text = nil
+                let userMessagesref = FIRDatabase.database().reference().child("user-messages").child(fromID).child(toID)
+                let messagesID = childRef.key
+                userMessagesref.updateChildValues([messagesID: 1])
+
+                let recipientUserMessagesRef = FIRDatabase.database().reference().child("user-messages").child(toID).child(fromID)
                 recipientUserMessagesRef.updateChildValues([messagesID: 1])
                 
             })
@@ -188,6 +280,7 @@ extension ChatLogVC {//datasource
         cell.setUpCell(message: message, user: self.user)
         return cell
     }
+    
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return messagesArray.count
     }
@@ -211,7 +304,8 @@ extension ChatLogVC: UICollectionViewDelegateFlowLayout {
     }
 }
 
-//MARK: keyboard
+
+//MARK: keyboard REGULAR
 extension ChatLogVC {
     
     func setUpInputComponents() {

@@ -46,42 +46,65 @@ class MessagesVC : UITableViewController {
         reference.observe(.childAdded, with: { (snapshot) in
             
             //snapshot example uid key (which is the message id in the messages node) and value KbqRNVuDfgXN9vjGNqZ : 1
-            let messageID = snapshot.key
-            //getting the message from the usermessagenode.id , they are related
-            let messagesRef = FIRDatabase.database().reference().child("messages").child(messageID)
-            //getting the messages
-            messagesRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            let userID = snapshot.key
+            FIRDatabase.database().reference().child("user-messages").child(uid).child(userID).observe(.childAdded, with: { (snapshot) in
                 
-                if let dictionary = snapshot.value as? [String: AnyObject] {
-                    
-                    let message = Message()
-                    message.text = dictionary["text"] as? String
-                    message.fromID = dictionary["fromID"] as? String
-                    message.toID = dictionary["toID"] as? String
-                    message.timeStamp = dictionary["timeStamp"] as? NSNumber
-                    //creating a hash table to put all the messages of one user in one cell
-                    //here we set the messages dictionary by adding the toiD as a key and the message as the value i.e
-                    //["z1sYeFqQVvNLyvgQbnGxUsESsfu2": <BrianChat.Message: 0x6080000eef00>]
-                    //UPDATE: here we need the chatpartner
-                    if let chatPartnerID = message.checkPartenrID() {
-                        self.messagedictionary[chatPartnerID] = message
-                        self.messageArray = Array(self.messagedictionary.values) as! [Message]
-                        
-                        //Sorting ARRAY based on timestamp
-                        self.messageArray.sort(by: { (message1, message2) -> Bool in
-                            return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
-                        })
-                        //avoiding to reload the table multiple times HACK
-                        self.timer?.invalidate()
-                        self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
-                    }
-        
-                }
-            })
-        }, withCancel: nil)
+                let messageID = snapshot.key
+                //getting the message from the usermessagenode.id , they are related
+                self.fetchMessagesWith(messageID: messageID)
+           
+            }, withCancel: nil)
+        })
     }
     
+    private func fetchMessagesWith(messageID: String) {
+        
+        let messagesRef = FIRDatabase.database().reference().child("messages").child(messageID)
+        //getting the messages
+        messagesRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                
+                let message = Message()
+                message.text = dictionary["text"] as? String
+                message.fromID = dictionary["fromID"] as? String
+                message.toID = dictionary["toID"] as? String
+                message.timeStamp = dictionary["timeStamp"] as? NSNumber
+                //creating a hash table to put all the messages of one user in one cell
+                //here we set the messages dictionary by adding the toiD as a key and the message as the value i.e
+                //["z1sYeFqQVvNLyvgQbnGxUsESsfu2": <BrianChat.Message: 0x6080000eef00>]
+                //UPDATE: here we need the chatpartner
+                if let chatPartnerID = message.checkPartenrID() {
+                    
+                    self.messagedictionary[chatPartnerID] = message
+                    
+                    //avoiding to reload the table multiple times HACK
+                    self.attemptToReloadTable()
+                }
+            }
+        })
+        
+    }
+    
+    private func attemptToReloadTable() {
+        
+        self.timer?.invalidate()
+        self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
+    }
+
+    
     func handleReloadTable() {
+        self.messageArray = Array(self.messagedictionary.values) as! [Message]
+        
+        //Sorting ARRAY based on timestamp
+        self.messageArray.sort(by: { (message1, message2) -> Bool in
+            
+            if let messageTimeStamp1 = message1.timeStamp?.intValue, let messageTimeStamp2 = message2.timeStamp?.intValue {
+                return messageTimeStamp1 > messageTimeStamp2
+            }
+            return false
+        })
+        
         DispatchQueue.main.async {
             print("reloading table")
             self.tableView.reloadData()

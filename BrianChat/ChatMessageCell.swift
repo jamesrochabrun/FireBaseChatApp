@@ -47,6 +47,14 @@ class ChatMessageCell: UICollectionViewCell {
         return imageView
     }()
     
+    let messageImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.layer.cornerRadius = 16
+        imageView.contentMode = .scaleAspectFill
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.clipsToBounds = true
+        return imageView
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -54,6 +62,7 @@ class ChatMessageCell: UICollectionViewCell {
         addSubview(bubbleView)
         addSubview(textView)
         addSubview(profileImageView)
+        bubbleView.addSubview(messageImageView)
         setUpViews()
     }
     
@@ -63,6 +72,11 @@ class ChatMessageCell: UICollectionViewCell {
         profileImageView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         profileImageView.widthAnchor.constraint(equalToConstant: 32).isActive = true
         profileImageView.heightAnchor.constraint(equalToConstant: 32).isActive = true
+        
+        messageImageView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor).isActive = true
+        messageImageView.topAnchor.constraint(equalTo: bubbleView.topAnchor).isActive = true
+        messageImageView.widthAnchor.constraint(equalTo: bubbleView.widthAnchor).isActive = true
+        messageImageView.heightAnchor.constraint(equalTo: bubbleView.heightAnchor).isActive = true
         
         //we are going to create a reference of the bubble width to modify the width of the bubbe in cell for row at indexpath in chatlogvc
         
@@ -77,7 +91,7 @@ class ChatMessageCell: UICollectionViewCell {
         
         bubbleViewLefttAnchor = bubbleView.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8)
         bubbleViewLefttAnchor?.isActive = false
-
+    
         
         textView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         textView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor).isActive = true
@@ -119,6 +133,14 @@ class ChatMessageCell: UICollectionViewCell {
             textView.text = messageText
             //here we modify the width of the bubble using the reference of the width bubble constraint
             bubbleWidthAnchor?.constant = ChatMessageCell.estimatedFrameForText(text: messageText).width + 32
+        }
+        
+        if let messageImageURL = message.imageURL {
+            messageImageView.loadImageUsingCacheWithURLString(messageImageURL)
+            messageImageView.isHidden = false
+            bubbleView.backgroundColor = UIColor.clear
+        } else {
+            messageImageView.isHidden = true
         }
     }
     

@@ -15,6 +15,7 @@ class Message: NSObject {
     var text: String?
     var timeStamp: NSNumber?
     var toID: String?
+    var imageURL: String?
 
     
     func checkPartenrID() -> String? {
