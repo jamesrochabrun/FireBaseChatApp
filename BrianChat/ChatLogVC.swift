@@ -8,6 +8,8 @@
 
 import UIKit
 import Firebase
+import MobileCoreServices
+import AVFoundation
 
 class ChatLogVC: UICollectionViewController {
     
@@ -45,7 +47,7 @@ class ChatLogVC: UICollectionViewController {
         uploadImageView.translatesAutoresizingMaskIntoConstraints = false
         uploadImageView.image = UIImage(named: "editor")
         uploadImageView.isUserInteractionEnabled = true
-        uploadImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleUploadTab)))
+        uploadImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleUploadTap)))
         containerView.addSubview(uploadImageView)
         uploadImageView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
         uploadImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
@@ -203,11 +205,12 @@ class ChatLogVC: UICollectionViewController {
 //MARK: UIIMAGEPICKER IMPLEMENTATIO STEP BY STEP
 extension ChatLogVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    func handleUploadTab() {
+    func handleUploadTap() {
         //BASIC STEPS FOR UIIMAGEPICKER
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
         imagePickerController.allowsEditing = true
+        imagePickerController.mediaTypes = [kUTTypeImage as String, kUTTypeMovie as String]
         present(imagePickerController, animated: true)
     }
     
@@ -218,16 +221,49 @@ extension ChatLogVC: UIImagePickerControllerDelegate, UINavigationControllerDele
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
-        var selectedImageFromPicker: UIImage?
-        
-        if let editedImage = info["UIImagePickerControllerEditedImage"] as? UIImage {
-            selectedImageFromPicker = editedImage
-        } else if let originalImage = info["UIImagePickerControllerOriginalImage"] as? UIImage {
-            selectedImageFromPicker = originalImage
+        if let videoURL = info[UIImagePickerControllerMediaURL] as? URL {
+            
+            uploadToFirebaseStorageUsingURL(videoURL)
+        } else {
+            
+            var selectedImageFromPicker: UIImage?
+            if let editedImage = info[UIImagePickerControllerEditedImage] as? UIImage {
+                selectedImageFromPicker = editedImage
+            } else if let originalImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+                selectedImageFromPicker = originalImage
+            }
+            
+            if let selectedImage = selectedImageFromPicker {
+                uploadToFirebaseStorageUsingImage(selectedImage)
+            }
         }
+        dismiss(animated: true, completion: nil)
+    }
+    
+    private func uploadToFirebaseStorageUsingURL(_ url: URL) {
         
-        if let selectedImage = selectedImageFromPicker {
-            uploadToFirebaseStorageUsingImage(selectedImage)
+      let uploadTask = FIRStorage.storage().reference().child("someFileName.mov").putFile(url, metadata: nil, completion: { (metadata, error) in
+            if error != nil {
+                print("ERROR STORING THE VIDEO URL IN FIREBASE", error ?? "ERROR")
+                return
+            }
+            if let videoURL = metadata?.downloadURL()?.absoluteString {
+                let properties: [String: AnyObject] = ["videoURL": videoURL as AnyObject]
+                self.sendMessageWith(properties: properties)
+            }
+        })
+        handleUploadStatusFrom(task: uploadTask)
+    }
+    
+    private func handleUploadStatusFrom(task: FIRStorageUploadTask) {
+        
+        task.observe(.progress) { (snapshot) in
+            if let completedUintCount = snapshot.progress?.completedUnitCount {
+                self.navigationItem.title = String(completedUintCount)
+            }
+        }
+        task.observe(.success) { (snapshot) in
+            self.navigationItem.title = self.user?.name
         }
     }
     
@@ -242,13 +278,11 @@ extension ChatLogVC: UIImagePickerControllerDelegate, UINavigationControllerDele
                     print("FAILED TO UPLOAD IMAGE")
                     return
                 }
-                
                 if let imageURL = metadata?.downloadURL()?.absoluteString {
                     self.sendMessageWith(imageURL: imageURL, image: image)
                 }
             })
         }
-        dismiss(animated: true, completion: nil)
     }
     
     private func sendMessageWith(imageURL: String, image: UIImage) {
@@ -344,11 +378,7 @@ extension ChatLogVC: ChatMessageCellDelegate {
             }
         }
     }
-    
-    func setUpZoomInViews() {
-        
-    }
-    
+
     func handleZoomOut(tapGesture: UITapGestureRecognizer) {
         
         if let zoomOutImageView = tapGesture.view as? UIImageView {
