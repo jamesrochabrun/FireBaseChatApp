@@ -91,6 +91,7 @@ class ChatLogVC: UICollectionViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         collectionView?.backgroundColor = UIColor.white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellID)
         collectionView?.alwaysBounceVertical = true
@@ -99,11 +100,12 @@ class ChatLogVC: UICollectionViewController {
         //UNCOMMENT THIS IF WE WANT TO SWITCH TO REGULAR KEYBOARD APPEREANCE
         //collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
         //setUpInputComponents()
-        //setUpKeyboardObservers()
+        setUpKeyboardObservers()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -127,8 +129,7 @@ class ChatLogVC: UICollectionViewController {
                     print("SNAPSHOT VALUE FROM CHATLOG ERROR")
                     return
                 }
-                let message = Message()
-                message.setValuesForKeys(dictionary)
+                let message = Message(dictionary: dictionary)
                 
                 //filtering messages
                 //self.user.id is the user that we clicked on
@@ -136,13 +137,23 @@ class ChatLogVC: UICollectionViewController {
                 self.messagesArray.append(message)
                 DispatchQueue.main.async {
                     self.collectionView?.reloadData()
+                    //scroll to last index
+                    let indexPath = NSIndexPath(item: self.messagesArray.count - 1 , section: 0)
+                    self.collectionView?.scrollToItem(at: indexPath as IndexPath, at: .bottom, animated: true)
                 }
             })
         })
     }
     
-    
     func handleSend() {
+        
+        if let text = inputTextField.text {
+            let properties: [String : AnyObject] = ["text" : text as AnyObject]
+            sendMessageWith(properties: properties)
+        }
+    }
+    
+    fileprivate func sendMessageWith(properties: [String: AnyObject]) {
         
         //creating a reference to the parent node
         let reference = FIRDatabase.database().reference().child("messages")
@@ -152,10 +163,12 @@ class ChatLogVC: UICollectionViewController {
         //the user logged in
         //to the user that the message was sent
         if let fromID = FIRAuth.auth()?.currentUser?.uid, let toID = self.user?.id {
-            let values = ["text" : inputTextField.text!, "toID" : toID, "fromID" : fromID, "timeStamp" : timeStamp] as [String : Any]
-            // childRef.updateChildValues(values)
-            
-            //
+            var values: [String : AnyObject] = ["toID" : toID as AnyObject, "fromID" : fromID as AnyObject, "timeStamp" : timeStamp as AnyObject]
+                
+            //append properties dictionary to values dictionary
+            //key $0, value $1 , iteration like a for loop
+            properties.forEach({values[$0] = $1})
+
             childRef.updateChildValues(values, withCompletionBlock: { (error, snapshot) in
                 
                 if error != nil {
@@ -172,7 +185,7 @@ class ChatLogVC: UICollectionViewController {
                 //fromID the sender
                 //reference to the message by id provided by this  reference.childByAutoId
                 
-                //NOW WE NEED TO BIND THE MESSAGE TO THE RECEPIENT or toID 
+                //NOW WE NEED TO BIND THE MESSAGE TO THE RECEPIENT or toID
                 let recipientUserMessagesRef = FIRDatabase.database().reference().child("user-messages").child(toID).child(fromID)
                 recipientUserMessagesRef.updateChildValues([messagesID: 1])
                 
@@ -191,10 +204,12 @@ extension ChatLogVC: UIImagePickerControllerDelegate, UINavigationControllerDele
         //BASIC STEPS FOR UIIMAGEPICKER
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
+        imagePickerController.allowsEditing = true
         present(imagePickerController, animated: true)
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        
         dismiss(animated: true, completion: nil)
     }
     
@@ -226,40 +241,17 @@ extension ChatLogVC: UIImagePickerControllerDelegate, UINavigationControllerDele
                 }
                 
                 if let imageURL = metadata?.downloadURL()?.absoluteString {
-                    self.sendMessageWith(imageURL: imageURL)
+                    self.sendMessageWith(imageURL: imageURL, image: image)
                 }
             })
         }
         dismiss(animated: true, completion: nil)
     }
     
-    private func sendMessageWith(imageURL: String) {
+    private func sendMessageWith(imageURL: String, image: UIImage) {
         
-        let reference = FIRDatabase.database().reference().child("messages")
-        let childRef = reference.childByAutoId()
-        let timeStamp:Int = Int(NSDate().timeIntervalSince1970)
-
-        if let fromID = FIRAuth.auth()?.currentUser?.uid, let toID = self.user?.id {
-            let values = ["imageURL" : imageURL, "toID" : toID, "fromID" : fromID, "timeStamp" : timeStamp] as [String : Any]
-
-            childRef.updateChildValues(values, withCompletionBlock: { (error, snapshot) in
-                
-                if error != nil {
-                    print("ERROR IN HANDLESEND METHOD: \(error)")
-                }
-                self.inputTextField.text = nil
-                let userMessagesref = FIRDatabase.database().reference().child("user-messages").child(fromID).child(toID)
-                let messagesID = childRef.key
-                userMessagesref.updateChildValues([messagesID: 1])
-
-                let recipientUserMessagesRef = FIRDatabase.database().reference().child("user-messages").child(toID).child(fromID)
-                recipientUserMessagesRef.updateChildValues([messagesID: 1])
-                
-            })
-            
-        } else {
-            print("PROBLEM SENDING MESSAGE IN HANDLESEND METHOD:")
-        }
+        let properties: [String : AnyObject] = ["imageURL" : imageURL as AnyObject, "imageWidth" : image.size.width as AnyObject, "imageHeight" : image.size.height as AnyObject]
+        sendMessageWith(properties: properties)
     }
 }
 
@@ -282,6 +274,7 @@ extension ChatLogVC {//datasource
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
         return messagesArray.count
     }
 }
@@ -291,11 +284,27 @@ extension ChatLogVC: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         var height: CGFloat = 80
-        if let text = messagesArray[indexPath.item].text {
+        let message = messagesArray[indexPath.item]
+        if let text = message.text {
             height = ChatMessageCell.estimatedFrameForText(text: text).height + 20 ///this 20 is beacuse textview needs extra padding always
+        } else if let imageWidth = message.imageWidth?.floatValue, let imageHeight = message.imageHeight?.floatValue  {
+            
+            height = ChatMessageCell.estimateHeightForImageViewBasedOn(height: CGFloat(imageHeight), width: CGFloat(imageWidth))
         }
+        
         let width = UIScreen.main.bounds.width
         return CGSize(width: width, height: height)
+        
+//        
+//        if message.imageURL == nil {
+//            if let text = message.text {
+//                height = ChatMessageCell.estimatedFrameForText(text: text).height + 20 ///this 20 is beacuse textview needs extra padding always
+//            }
+//        } else {
+//            if let imageWidth = message.imageWidth?.floatValue, let imageHeight = message.imageHeight?.floatValue  {
+//                height = ChatMessageCell.estimateHeightForImageViewBasedOn(height: CGFloat(imageHeight), width: CGFloat(imageWidth))
+//            }
+//        }
     }
     
     
@@ -351,11 +360,23 @@ extension ChatLogVC {
     
     func setUpKeyboardObservers() {
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        //        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        //        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardDidShow), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
+    }
+    
+    func handleKeyboardDidShow() {
+        
+        if messagesArray.count > 0 {
+            let indexPath = NSIndexPath(item: messagesArray.count - 1 , section: 0)
+            DispatchQueue.main.async {
+                self.collectionView?.scrollToItem(at: indexPath as IndexPath, at: .top, animated: true)
+            }
+        }
     }
     
     func handleKeyboardWillShow(notification: NSNotification) {
+        
         let keyboardFrame = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect
         if let keyboardFrame = keyboardFrame {
             containerViewBottomAnchor?.constant = -keyboardFrame.height
@@ -369,6 +390,7 @@ extension ChatLogVC {
     }
     
     func handleKeyboardWillHide(notification: NSNotification) {
+        
         containerViewBottomAnchor?.constant = 0
         let keyboardDuration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? Double
         

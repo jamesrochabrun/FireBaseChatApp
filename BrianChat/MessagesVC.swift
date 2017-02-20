@@ -65,11 +65,8 @@ class MessagesVC : UITableViewController {
             
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 
-                let message = Message()
-                message.text = dictionary["text"] as? String
-                message.fromID = dictionary["fromID"] as? String
-                message.toID = dictionary["toID"] as? String
-                message.timeStamp = dictionary["timeStamp"] as? NSNumber
+                let message = Message(dictionary: dictionary)
+ 
                 //creating a hash table to put all the messages of one user in one cell
                 //here we set the messages dictionary by adding the toiD as a key and the message as the value i.e
                 //["z1sYeFqQVvNLyvgQbnGxUsESsfu2": <BrianChat.Message: 0x6080000eef00>]

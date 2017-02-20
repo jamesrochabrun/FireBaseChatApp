@@ -11,6 +11,7 @@
 		7B3727BC1E381130001299F1 /* NewMessageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3727BB1E381130001299F1 /* NewMessageVC.swift */; };
 		7B3727BE1E381740001299F1 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3727BD1E381740001299F1 /* User.swift */; };
 		7B3727C21E382917001299F1 /* LoginVC+handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3727C11E382917001299F1 /* LoginVC+handlers.swift */; };
+		7B54B44D1E5A4F070098C98F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B54B44C1E5A4F070098C98F /* Constants.swift */; };
 		7B6098F31E401C8F00986B31 /* ChatLogVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6098F21E401C8F00986B31 /* ChatLogVC.swift */; };
 		7B6098F51E403C0900986B31 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6098F41E403C0900986B31 /* Message.swift */; };
 		7B6098F81E405B6100986B31 /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6098F71E405B6100986B31 /* UserCell.swift */; };
@@ -31,6 +32,7 @@
 		7B3727BB1E381130001299F1 /* NewMessageVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewMessageVC.swift; sourceTree = "<group>"; };
 		7B3727BD1E381740001299F1 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		7B3727C11E382917001299F1 /* LoginVC+handlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginVC+handlers.swift"; sourceTree = "<group>"; };
+		7B54B44C1E5A4F070098C98F /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		7B6098F21E401C8F00986B31 /* ChatLogVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatLogVC.swift; sourceTree = "<group>"; };
 		7B6098F41E403C0900986B31 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		7B6098F71E405B6100986B31 /* UserCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 		7BB6FAAB1E395026009E8D06 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				7B54B44C1E5A4F070098C98F /* Constants.swift */,
 				7BB6FAAC1E395033009E8D06 /* Extensions.swift */,
 			);
 			name = Helpers;
@@ -293,6 +296,7 @@
 				7B6800051E36EE6C00685D40 /* LoginVC.swift in Sources */,
 				7B6098F81E405B6100986B31 /* UserCell.swift in Sources */,
 				7BB6FAAD1E395033009E8D06 /* Extensions.swift in Sources */,
+				7B54B44D1E5A4F070098C98F /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

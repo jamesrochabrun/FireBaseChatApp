@@ -16,7 +16,6 @@ class ChatMessageCell: UICollectionViewCell {
     var bubbleWidthAnchor: NSLayoutConstraint?
     var bubbleViewRightAnchor: NSLayoutConstraint?
     var bubbleViewLefttAnchor: NSLayoutConstraint?
-
     
     let bubbleView: UIView = {
         let bv = UIView()
@@ -31,6 +30,7 @@ class ChatMessageCell: UICollectionViewCell {
         tv.font = UIFont.systemFont(ofSize: 16)
         tv.backgroundColor = .clear
         tv.isUserInteractionEnabled = false
+        tv.isEditable = false
         tv.isScrollEnabled = false
         tv.showsVerticalScrollIndicator = false
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -102,10 +102,20 @@ class ChatMessageCell: UICollectionViewCell {
         
         //200 is the width of the textview inside the cell
         //the font size is also related with the textview
-        let size = CGSize(width: 200, height: 1000)
+        let size = CGSize(width: Constants.UI.imageViewDefaultWidth, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
         
         return NSString(string: text).boundingRect(with: size, options: options, attributes: [NSFontAttributeName : UIFont.systemFont(ofSize: 16)], context: nil)
+    }
+    
+    static func estimateHeightForImageViewBasedOn(height: CGFloat, width: CGFloat) -> CGFloat {
+        
+        //equation to get newheight
+        //h1/ w1 = h2 / w2
+        // solve for h1
+        //h1 = h2/ w2 * w1
+        let dynamicHeight = height / width * Constants.UI.imageViewDefaultWidth
+        return dynamicHeight
     }
         
     func setUpCell(message: Message, user: User?) {
@@ -133,6 +143,9 @@ class ChatMessageCell: UICollectionViewCell {
             textView.text = messageText
             //here we modify the width of the bubble using the reference of the width bubble constraint
             bubbleWidthAnchor?.constant = ChatMessageCell.estimatedFrameForText(text: messageText).width + 32
+        } else if message.imageURL != nil {
+            bubbleWidthAnchor?.constant = Constants.UI.imageViewDefaultWidth
+            textView.text = nil
         }
         
         if let messageImageURL = message.imageURL {
