@@ -9,6 +9,11 @@
 import Firebase
 import UIKit
 
+protocol ChatMessageCellDelegate: class {
+    func performZoomInFor(startingImageView: UIImageView)
+}
+
+
 class ChatMessageCell: UICollectionViewCell {
     
     static let blueColor = UIColor(r: 0, g: 137, b: 249, alpha: 1)
@@ -16,6 +21,7 @@ class ChatMessageCell: UICollectionViewCell {
     var bubbleWidthAnchor: NSLayoutConstraint?
     var bubbleViewRightAnchor: NSLayoutConstraint?
     var bubbleViewLefttAnchor: NSLayoutConstraint?
+    weak var delegate: ChatMessageCellDelegate?
     
     let bubbleView: UIView = {
         let bv = UIView()
@@ -47,12 +53,14 @@ class ChatMessageCell: UICollectionViewCell {
         return imageView
     }()
     
-    let messageImageView: UIImageView = {
+    lazy var messageImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.layer.cornerRadius = 16
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleMessageImageTap)))
         return imageView
     }()
     
@@ -157,9 +165,22 @@ class ChatMessageCell: UICollectionViewCell {
         }
     }
     
+    func handleMessageImageTap(tapGesture: UITapGestureRecognizer) {
+        print(tapGesture)
+        if let imageView = tapGesture.view as? UIImageView {
+            delegate?.performZoomInFor(startingImageView: imageView)
+        }
+    }
+    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
 }
+
+
+
+
+
+
