@@ -54,15 +54,16 @@ class ChatLogVC: UICollectionViewController {
         uploadImageView.widthAnchor.constraint(equalToConstant: 44).isActive = true
         uploadImageView.heightAnchor.constraint(equalToConstant: 44).isActive = true
         
-        let sendButton = UIButton(type: .system)
+        let sendButton = UIButton(type: .custom)
         sendButton.setTitle("SEND", for: .normal)
+        sendButton.setImage(#imageLiteral(resourceName: "sendButton"), for: UIControlState.normal)
         sendButton.addTarget(self, action: #selector(handleSend), for: .touchUpInside)
         sendButton.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(sendButton)
         sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
         sendButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
-        sendButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
-        sendButton.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
+        sendButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        sendButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
         
         containerView.addSubview(self.inputTextField)
         self.inputTextField.leftAnchor.constraint(equalTo: uploadImageView.rightAnchor, constant: 8).isActive = true
@@ -153,6 +154,8 @@ class ChatLogVC: UICollectionViewController {
     func handleSend() {
         
         if let text = inputTextField.text {
+            
+            if text.characters.count <= 0 {return}
             let properties: [String : AnyObject] = ["text" : text as AnyObject]
             sendMessageWith(properties: properties)
         }

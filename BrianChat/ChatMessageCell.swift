@@ -102,8 +102,9 @@ class ChatMessageCell: UICollectionViewCell {
     
         
         textView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        textView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor).isActive = true
         textView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        textView.centerXAnchor.constraint(equalTo: bubbleView.centerXAnchor).isActive = true
+        textView.widthAnchor.constraint(equalTo: bubbleView.widthAnchor).isActive = true
     }
     
     static func estimatedFrameForText(text: String) -> CGRect {
@@ -160,8 +161,10 @@ class ChatMessageCell: UICollectionViewCell {
             messageImageView.loadImageUsingCacheWithURLString(messageImageURL)
             messageImageView.isHidden = false
             bubbleView.backgroundColor = UIColor.clear
+            textView.isHidden = true
         } else {
             messageImageView.isHidden = true
+            textView.isHidden = false
         }
     }
     
