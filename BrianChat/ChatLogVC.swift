@@ -237,7 +237,9 @@ extension ChatLogVC: UIImagePickerControllerDelegate, UINavigationControllerDele
             }
             
             if let selectedImage = selectedImageFromPicker {
-                uploadToFirebaseStorageUsingImage(selectedImage)
+                uploadToFirebaseStorageUsingImage(selectedImage, completion: { (imageURL) in
+                    self.sendMessageWith(imageURL: imageURL, image: selectedImage)
+                })
             }
         }
         dismiss(animated: true, completion: nil)
@@ -245,17 +247,37 @@ extension ChatLogVC: UIImagePickerControllerDelegate, UINavigationControllerDele
     
     private func uploadToFirebaseStorageUsingURL(_ url: URL) {
         
-      let uploadTask = FIRStorage.storage().reference().child("someFileName.mov").putFile(url, metadata: nil, completion: { (metadata, error) in
+        let fileName = NSUUID().uuidString + ".mov"
+        let uploadTask = FIRStorage.storage().reference().child("message_movies").child(fileName).putFile(url, metadata: nil, completion: { (metadata, error) in
             if error != nil {
                 print("ERROR STORING THE VIDEO URL IN FIREBASE", error ?? "ERROR")
                 return
             }
-            if let videoURL = metadata?.downloadURL()?.absoluteString {
-                let properties: [String: AnyObject] = ["videoURL": videoURL as AnyObject]
-                self.sendMessageWith(properties: properties)
+            if let videoURL = metadata?.downloadURL()?.absoluteString, let thumbnailImage = self.thumbnailImageFor(url: url) {
+                self.uploadToFirebaseStorageUsingImage(thumbnailImage, completion: { (imageURL) in
+                    
+                    let properties: [String: AnyObject] = ["imageURL" : imageURL as AnyObject ,"videoURL": videoURL as AnyObject, "imageWidth" : thumbnailImage.size.width as AnyObject, "imageHeight": thumbnailImage.size.height as AnyObject]
+                    
+                    self.sendMessageWith(properties: properties)
+                })
+                
             }
         })
         handleUploadStatusFrom(task: uploadTask)
+    }
+    
+    private func thumbnailImageFor(url: URL) -> UIImage? {
+        let asset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        
+        do {
+            let thumbnailCGImage = try  imageGenerator.copyCGImage(at: CMTimeMake(1, 60), actualTime: nil)
+            return UIImage(cgImage: thumbnailCGImage)
+
+        } catch let err {
+            print("ERROR ON THUMBNAIL: ", err)
+        }
+        return nil
     }
     
     private func handleUploadStatusFrom(task: FIRStorageUploadTask) {
@@ -270,7 +292,7 @@ extension ChatLogVC: UIImagePickerControllerDelegate, UINavigationControllerDele
         }
     }
     
-    private func uploadToFirebaseStorageUsingImage(_ image: UIImage) {
+    private func uploadToFirebaseStorageUsingImage(_ image: UIImage, completion: @escaping (_ imageURL: String) ->()) {
         
         let imageName = NSUUID().uuidString
         let ref = FIRStorage.storage().reference().child("messages_images").child(imageName)
@@ -282,7 +304,7 @@ extension ChatLogVC: UIImagePickerControllerDelegate, UINavigationControllerDele
                     return
                 }
                 if let imageURL = metadata?.downloadURL()?.absoluteString {
-                    self.sendMessageWith(imageURL: imageURL, image: image)
+                    completion(imageURL)
                 }
             })
         }
@@ -309,6 +331,7 @@ extension ChatLogVC {//datasource
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! ChatMessageCell
         cell.delegate = self
         let message = self.messagesArray[indexPath.item]
+        cell.message = message
         cell.setUpCell(message: message, user: self.user)
         return cell
     }

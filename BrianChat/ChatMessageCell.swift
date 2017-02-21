@@ -8,11 +8,11 @@
 
 import Firebase
 import UIKit
+import AVFoundation
 
 protocol ChatMessageCellDelegate: class {
     func performZoomInFor(startingImageView: UIImageView)
 }
-
 
 class ChatMessageCell: UICollectionViewCell {
     
@@ -22,6 +22,9 @@ class ChatMessageCell: UICollectionViewCell {
     var bubbleViewRightAnchor: NSLayoutConstraint?
     var bubbleViewLefttAnchor: NSLayoutConstraint?
     weak var delegate: ChatMessageCellDelegate?
+    var message: Message?
+    var playerLayer: AVPlayerLayer?
+    var player: AVPlayer?
     
     let bubbleView: UIView = {
         let bv = UIView()
@@ -40,6 +43,7 @@ class ChatMessageCell: UICollectionViewCell {
         tv.isScrollEnabled = false
         tv.showsVerticalScrollIndicator = false
         tv.translatesAutoresizingMaskIntoConstraints = false
+        tv.textAlignment = .center
         return tv
     }()
     
@@ -64,6 +68,22 @@ class ChatMessageCell: UICollectionViewCell {
         return imageView
     }()
     
+    lazy var playButton: UIButton = {
+        let button = UIButton(type: UIButtonType.custom)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setImage(#imageLiteral(resourceName: "whiteJoystick"), for: .normal)
+        button.tintColor = .white
+        button.addTarget(self, action: #selector(handlePlay), for: .touchUpInside)
+        return button
+    }()
+    
+    let activityIndicatorView: UIActivityIndicatorView = {
+        let aiv = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        aiv.translatesAutoresizingMaskIntoConstraints = false
+        aiv.hidesWhenStopped = true
+        return aiv
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -71,6 +91,8 @@ class ChatMessageCell: UICollectionViewCell {
         addSubview(textView)
         addSubview(profileImageView)
         bubbleView.addSubview(messageImageView)
+        bubbleView.addSubview(playButton)
+        bubbleView.addSubview(activityIndicatorView)
         setUpViews()
     }
     
@@ -99,7 +121,16 @@ class ChatMessageCell: UICollectionViewCell {
         
         bubbleViewLefttAnchor = bubbleView.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8)
         bubbleViewLefttAnchor?.isActive = false
-    
+        
+        playButton.centerXAnchor.constraint(equalTo: bubbleView.centerXAnchor).isActive = true
+        playButton.centerYAnchor.constraint(equalTo: bubbleView.centerYAnchor).isActive = true
+        playButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        playButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        activityIndicatorView.centerXAnchor.constraint(equalTo: bubbleView.centerXAnchor).isActive = true
+        activityIndicatorView.centerYAnchor.constraint(equalTo: bubbleView.centerYAnchor).isActive = true
+        activityIndicatorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        activityIndicatorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         textView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         textView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
@@ -152,29 +183,51 @@ class ChatMessageCell: UICollectionViewCell {
             textView.text = messageText
             //here we modify the width of the bubble using the reference of the width bubble constraint
             bubbleWidthAnchor?.constant = ChatMessageCell.estimatedFrameForText(text: messageText).width + 32
-        } else if message.imageURL != nil {
+            messageImageView.isHidden = true
+            textView.isHidden = false
+        } else if let messageImageURL = message.imageURL {
             bubbleWidthAnchor?.constant = Constants.UI.imageViewDefaultWidth
-            textView.text = nil
-        }
-        
-        if let messageImageURL = message.imageURL {
             messageImageView.loadImageUsingCacheWithURLString(messageImageURL)
             messageImageView.isHidden = false
             bubbleView.backgroundColor = UIColor.clear
             textView.isHidden = true
-        } else {
-            messageImageView.isHidden = true
-            textView.isHidden = false
+        }
+        
+        playButton.isHidden = message.videoURL == nil
+    }
+    
+    func handlePlay() {
+        print("play")
+        
+        if let videoURL = message?.videoURL, let url = URL(string: videoURL) {
+            player = AVPlayer(url: url)
+            playerLayer = AVPlayerLayer(player: player)
+            if playerLayer != nil {
+                playerLayer?.frame = bubbleView.bounds
+                bubbleView.layer.addSublayer(playerLayer!)
+            }
+            player?.play()
+            activityIndicatorView.startAnimating()
+            playButton.isHidden = true
         }
     }
     
     func handleMessageImageTap(tapGesture: UITapGestureRecognizer) {
-        print(tapGesture)
+        
+        if message?.videoURL != nil {
+            return
+        }
         if let imageView = tapGesture.view as? UIImageView {
             delegate?.performZoomInFor(startingImageView: imageView)
         }
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        playerLayer?.removeFromSuperlayer()
+        player?.pause()
+        activityIndicatorView.stopAnimating()
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
