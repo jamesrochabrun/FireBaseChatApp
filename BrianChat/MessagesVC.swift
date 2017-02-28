@@ -20,6 +20,7 @@ class MessagesVC : UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
+        tableView.allowsMultipleSelection = true
     
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         
@@ -55,6 +56,18 @@ class MessagesVC : UITableViewController {
            
             }, withCancel: nil)
         })
+        observeMessageRemoved(reference)
+    }
+    
+    func observeMessageRemoved(_ reference: FIRDatabaseReference) {
+        reference.observe(.childRemoved, with: { (snapshot) in
+            
+            print(snapshot.key)
+            print(self.messagedictionary)
+            self.messagedictionary.removeValue(forKey: snapshot.key)
+            self.attemptToReloadTable()
+        })
+        
     }
     
     private func fetchMessagesWith(messageID: String) {
@@ -83,7 +96,7 @@ class MessagesVC : UITableViewController {
         
     }
     
-    private func attemptToReloadTable() {
+    fileprivate func attemptToReloadTable() {
         
         self.timer?.invalidate()
         self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
@@ -263,6 +276,31 @@ extension MessagesVC {
             user.setValuesForKeys(dictionary)
             self.showChatVCForUser(user)
         })
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        
+        guard let uid = FIRAuth.auth()?.currentUser?.uid  else {
+            print("NO UID WHEN ATTEMPTING TO DELETE")
+            return
+        }
+        let message = self.messageArray[indexPath.row]
+        
+        if let chatPartnerID = message.checkPartenrID() {
+            FIRDatabase.database().reference().child("user-messages").child(uid).child(chatPartnerID).removeValue(completionBlock: { (error, reference) in
+                if error != nil {
+                    print("FAILED TO DELETE MESSAGE", error ?? "FAILED TO DELETE MESSAGE")
+                    return
+                }
+                
+                self.messagedictionary.removeValue(forKey: chatPartnerID)
+                self.attemptToReloadTable()
+            })
+        }
     }
 }
 
